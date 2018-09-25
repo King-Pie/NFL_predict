@@ -13,12 +13,12 @@ data_path = r'./training_data/'
 
 # Evaluation set
 # Training set
-years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016']
+years = ['2010', '2011', '2012', '2013', '2014', '2015']
 all_files = [data_path + str(year) + '_database.csv' for year in years]
 train_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 
 # Testing set
-years = ['2017']
+years = ['2016', '2017']
 all_files = [data_path + str(year) + '_database.csv' for year in years]
 test_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 
@@ -27,21 +27,21 @@ feature_names = [
     'home_wpct',
     'home_h_wpct',
     'home_prev_wpct',
-    # 'home_prev_h_wpct',
+    'home_prev_h_wpct',
     'away_wpct',
     'away_a_wpct',
     'away_prev_wpct',
-    # 'away_prev_a_wpct',
-    # 'div_flag',
-    # 'matchup_weight',
+    'away_prev_a_wpct',
+    'div_flag',
+    'matchup_weight',
     'home_season_pt_dif',
     'home_3game_pt_dif',
     'home_5game_pt_dif',
-    # 'home_prev_season_pt_dif',
+    'home_prev_season_pt_dif',
     'away_season_pt_dif',
     'away_3game_pt_dif',
     'away_5game_pt_dif',
-    # 'away_prev_season_pt_dif'
+    'away_prev_season_pt_dif'
                  ]
 
 X_train = train_df[feature_names]
@@ -78,7 +78,6 @@ print('Accuracy of SVM classifier on test set: {:.2f}'
 # Training set
 # years = ['2014', '2015', '2016']
 years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017']
-years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016']
 all_files = [data_path + str(year) + '_database.csv' for year in years]
 train_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 
@@ -93,7 +92,7 @@ print 'Predictions'
 print('Accuracy of SVM classifier on training set: {:.2f}'
       .format(svm.score(X_train, Y_train)))
 
-year, week = 2017, 17
+year, week = 2018, 2
 games = utils.get_week_schedule(year, week)
 
 data_display_list = []

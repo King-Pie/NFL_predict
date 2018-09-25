@@ -39,18 +39,18 @@ years = ['2010',
 base_features = [
     'week',
     'home_wpct',
-    'away_wpct'
+    'home_h_wpct',
+    'home_prev_wpct',
+    'away_wpct',
+    'away_a_wpct',
+    'away_prev_wpct',
+    'matchup_weight',
 ]
 
 additional_features = [
-    'home_h_wpct',
-    'home_prev_wpct',
     'home_prev_h_wpct',
-    'away_a_wpct',
-    'away_prev_wpct',
     'away_prev_a_wpct',
     'div_flag',
-    'matchup_weight',
     'home_season_pt_dif',
     'home_3game_pt_dif',
     'home_5game_pt_dif',
