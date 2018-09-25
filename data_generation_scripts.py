@@ -7,7 +7,7 @@ pd.set_option('display.expand_frame_repr', False)
 pd.options.display.max_rows = 999
 
 
-year_list = range(2009, 2018)
+year_list = range(2010, 2018)
 training_year_list = range(2014, 2018)
 
 
@@ -137,7 +137,8 @@ def matchup_stats(games):
 
         # print progress generating each week
         if week_dummy != week:
-            print 'Generating matchup stats for {} week {}'.format(year, week)
+            if week % 4 == 0:
+                print 'Generating matchup stats for {} week {}'.format(year, week)
         week_dummy = week
 
         data_dict['matchup_weight'] = utils.matchup_weight(game)
@@ -147,11 +148,54 @@ def matchup_stats(games):
     return data
 
 
+def point_differential_stats(games):
+
+    data_dict = {}
+    data = []
+    header = ['home_season_pt_dif', 'home_3game_pt_dif', 'home_5game_pt_dif', 'home_prev_season_pt_dif',
+              'away_season_pt_dif', 'away_3game_pt_dif', 'away_5game_pt_dif', 'away_prev_season_pt_dif']
+    data.append(header)
+
+    week_dummy = 0
+    for game in games:
+        # for convenience
+        year, week = game['year'], game['week']
+        home, away = game['home'], game['away']
+
+        # print home, away
+
+        # print progress generating each week
+        if week_dummy != week:
+            if week % 4 == 0:
+                print 'Generating matchup stats for {} week {}'.format(year, week)
+        week_dummy = week
+
+        home_season_pt_dif, home_3game_pt_dif, home_5game_pt_dif = \
+            utils.team_pt_dif_per_n_games(home, year, week)
+        data_dict['home_season_pt_dif'] = home_season_pt_dif
+        data_dict['home_3game_pt_dif'] = home_3game_pt_dif
+        data_dict['home_5game_pt_dif'] = home_5game_pt_dif
+        data_dict['home_prev_season_pt_dif'] = utils.team_pt_dif_per_game_season(home, year-1)
+
+        away_season_pt_dif, away_3game_pt_dif, away_5game_pt_dif = \
+            utils.team_pt_dif_per_n_games(away, year, week)
+        data_dict['away_season_pt_dif'] = away_season_pt_dif
+        data_dict['away_3game_pt_dif'] = away_3game_pt_dif
+        data_dict['away_5game_pt_dif'] = away_5game_pt_dif
+        data_dict['away_prev_season_pt_dif'] = utils.team_pt_dif_per_game_season(away, year-1)
+
+        row = [data_dict[h] for h in header]
+        data.append(row)
+
+    return data
+
+
 def combine_data(year):
-    import glob, os
+    import glob
+
+    print 'Combing data for {}'.format(year)
 
     directory_path = './training_data/' + str(year) + '/'
-    # os.chdir(directory_path)
 
     all_files = glob.glob(directory_path + '*.csv')
     df = pd.concat((pd.read_csv(file) for file in all_files),
@@ -161,7 +205,13 @@ def combine_data(year):
 
 if __name__ == "__main__":
 
-    for year in training_year_list:
+    years = year_list
+    print years
+    years = [2017]
+    for year in years:
+        print 'Data generation for {}'.format(year)
         # data_generator(schedule_stats, year, '1_schedule_stats')
-        data_generator(matchup_stats, year, '3_matchup_stats')
+        # data_generator(current_record_stats, year, '2_current_record_stats')
+        # data_generator(matchup_stats, year, '3_matchup_stats')
+        data_generator(point_differential_stats, year, '4_point_differential_stats')
         combine_data(year)
