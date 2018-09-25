@@ -251,7 +251,7 @@ def team_pt_dif_per_n_games(team, year, week):
     except ValueError:
         return 0, 0, 0
 
-    pt_dif_list_per_week = season_pt_dif_list_per_week[0:last_game_week_idx + 1]
+    pt_dif_list_per_week = season_pt_dif_list_per_week[0:last_game_week_idx+1]
     pt_dif_list = [i[1] for i in pt_dif_list_per_week]
     pt_dif = sum(pt_dif_list)
     pt_dif_per_game = float(pt_dif)/len(pt_dif_list)
@@ -259,7 +259,8 @@ def team_pt_dif_per_n_games(team, year, week):
     # three game point differential
     # if week <= 3:
 
-    if len([w for w in week_list if w <= 3]) <= 3:
+    if len([w for w in week_list if w <= week]) <= 3:
+
         three_game_pt_dif_list_per_week = season_pt_dif_list_per_week[:week-1]
     else:
         three_game_pt_dif_list_per_week = \
@@ -269,12 +270,13 @@ def team_pt_dif_per_n_games(team, year, week):
     three_game_pt_dif = sum(three_game_pt_dif_list)
     three_game_pt_dif_per_game = float(three_game_pt_dif)/len(three_game_pt_dif_list)
 
+
     # five game point differential
 
     # print len([w for w in week_list if w <= 5]) <=5
 
     # if week <= 5:
-    if len([w for w in week_list if w <= 5]) <= 5:
+    if len([w for w in week_list if w <= week]) <= 5:
         five_game_pt_dif_list_per_week = season_pt_dif_list_per_week[:week-1]
 
     else:
@@ -286,6 +288,11 @@ def team_pt_dif_per_n_games(team, year, week):
     five_game_pt_dif = sum(five_game_pt_dif_list)
     five_game_pt_dif_per_game = float(five_game_pt_dif)/len(five_game_pt_dif_list)
 
+    # print season_pt_dif_list_per_week
+    # print pt_dif_list
+    # print three_game_pt_dif_list
+    # print five_game_pt_dif_list
+
     return \
         round(pt_dif_per_game, 3), \
         round(three_game_pt_dif_per_game, 3), \
@@ -294,7 +301,7 @@ def team_pt_dif_per_n_games(team, year, week):
 
 if __name__ == "__main__":
 
-    print team_pt_dif_per_n_games('TB', 2017, 2)
+    print team_pt_dif_per_n_games('TB', 2017, 10)
     print team_pt_dif_per_game_season('TB', 2016)
 
     # test_team = 'TB'

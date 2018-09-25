@@ -7,8 +7,7 @@ pd.set_option('display.expand_frame_repr', False)
 pd.options.display.max_rows = 999
 
 
-year_list = range(2010, 2018)
-training_year_list = range(2014, 2018)
+training_year_list = range(2010, 2018)
 
 
 def data_generator(stat_func, year, set_name, weeks=None):
@@ -205,9 +204,8 @@ def combine_data(year):
 
 if __name__ == "__main__":
 
-    years = year_list
+    years = training_year_list
     print years
-    years = [2017]
     for year in years:
         print 'Data generation for {}'.format(year)
         # data_generator(schedule_stats, year, '1_schedule_stats')

@@ -13,7 +13,7 @@ data_path = r'./training_data/'
 
 # Evaluation set
 # Training set
-years = ['2014', '2015', '2016']
+years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016']
 all_files = [data_path + str(year) + '_database.csv' for year in years]
 train_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 
@@ -27,13 +27,21 @@ feature_names = [
     'home_wpct',
     'home_h_wpct',
     'home_prev_wpct',
-    'home_prev_h_wpct',
+    # 'home_prev_h_wpct',
     'away_wpct',
     'away_a_wpct',
     'away_prev_wpct',
-    'away_prev_a_wpct',
-    'div_flag',
-    'matchup_weight',
+    # 'away_prev_a_wpct',
+    # 'div_flag',
+    # 'matchup_weight',
+    'home_season_pt_dif',
+    'home_3game_pt_dif',
+    'home_5game_pt_dif',
+    # 'home_prev_season_pt_dif',
+    'away_season_pt_dif',
+    'away_3game_pt_dif',
+    'away_5game_pt_dif',
+    # 'away_prev_season_pt_dif'
                  ]
 
 X_train = train_df[feature_names]
@@ -42,37 +50,6 @@ Y_train = train_df['result']
 X_test = test_df[feature_names]
 Y_test = test_df['result']
 
-# logreg = LogisticRegression()
-# logreg.fit(X_train, Y_train)
-# print('Accuracy of Logistic regression classifier on training set: {:.2f}'
-#       .format(logreg.score(X_train, Y_train)))
-# print('Accuracy of Logistic regression classifier on test set: {:.2f}'
-#       .format(logreg.score(X_test, Y_test)))
-#
-# from sklearn.neighbors import KNeighborsClassifier
-# knn = KNeighborsClassifier()
-# knn.fit(X_train, Y_train)
-# print('Accuracy of K-NN classifier on training set: {:.2f}'
-#       .format(knn.score(X_train, Y_train)))
-# print('Accuracy of K-NN classifier on test set: {:.2f}'
-#       .format(knn.score(X_test, Y_test)))
-#
-# from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-# lda = LinearDiscriminantAnalysis()
-# lda.fit(X_train, Y_train)
-# print('Accuracy of LDA classifier on training set: {:.2f}'
-#       .format(lda.score(X_train, Y_train)))
-# print('Accuracy of LDA classifier on test set: {:.2f}'
-#       .format(lda.score(X_test, Y_test)))
-#
-# from sklearn.naive_bayes import GaussianNB
-# gnb = GaussianNB()
-# gnb.fit(X_train, Y_train)
-# print('Accuracy of GNB classifier on training set: {:.2f}'
-#       .format(gnb.score(X_train, Y_train)))
-# print('Accuracy of GNB classifier on test set: {:.2f}'
-#       .format(gnb.score(X_test, Y_test)))
-
 
 def svc_param_selection(X, y, nfolds):
     from sklearn import svm
@@ -80,15 +57,14 @@ def svc_param_selection(X, y, nfolds):
     GridSearchCV = sklearn.model_selection.GridSearchCV
     Cs = [0.001, 0.01, 0.1, 1, 10]
     gammas = [0.001, 0.01, 0.1, 1]
-    param_grid = {'C': Cs, 'gamma' : gammas}
+    param_grid = {'C': Cs, 'gamma': gammas}
     grid_search = GridSearchCV(svm.SVC(kernel='rbf'), param_grid, cv=nfolds)
     grid_search.fit(X, y)
-    grid_search.best_params_
     return grid_search.best_params_
 
 
 print '---------'
-params = svc_param_selection(X_train, Y_train, 2)
+params = svc_param_selection(X_train, Y_train, 3)
 svm = SVC(C=params['C'], gamma=params['gamma'])
 svm.fit(X_train, Y_train)
 print('Accuracy of SVM classifier on training set: {:.2f}'
@@ -101,17 +77,15 @@ print('Accuracy of SVM classifier on test set: {:.2f}'
 # Prediction set
 # Training set
 # years = ['2014', '2015', '2016']
-years = ['2015', '2016', '2017']
+years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017']
+years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016']
 all_files = [data_path + str(year) + '_database.csv' for year in years]
 train_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 
 X_train = train_df[feature_names]
 Y_train = train_df['result']
 
-# model = LogisticRegression()
-# model.fit(X_train, Y_train)
-
-params = svc_param_selection(X_train, Y_train, 2)
+params = svc_param_selection(X_train, Y_train, 3)
 model = SVC(probability=True, C=params['C'], gamma=params['gamma'])
 model.fit(X_train, Y_train)
 
@@ -119,11 +93,10 @@ print 'Predictions'
 print('Accuracy of SVM classifier on training set: {:.2f}'
       .format(svm.score(X_train, Y_train)))
 
-year, week = 2018, 3
+year, week = 2017, 17
 games = utils.get_week_schedule(year, week)
 
 data_display_list = []
-data_display_list.append(['teams'] + feature_names)
 
 correct_counter = 0
 for game in games:
@@ -148,6 +121,20 @@ for game in games:
         utils.team_prev_season_win_pct(away, year, prev_seasons=1, type='away')
 
     data_dictionary['matchup_weight'] = utils.matchup_weight(game)
+
+    home_season_pt_dif, home_3game_pt_dif, home_5game_pt_dif = \
+        utils.team_pt_dif_per_n_games(home, year, week)
+    data_dictionary['home_season_pt_dif'] = home_season_pt_dif
+    data_dictionary['home_3game_pt_dif'] = home_3game_pt_dif
+    data_dictionary['home_5game_pt_dif'] = home_5game_pt_dif
+    data_dictionary['home_prev_season_pt_dif'] = utils.team_pt_dif_per_game_season(home, year - 1)
+
+    away_season_pt_dif, away_3game_pt_dif, away_5game_pt_dif = \
+        utils.team_pt_dif_per_n_games(away, year, week)
+    data_dictionary['away_season_pt_dif'] = away_season_pt_dif
+    data_dictionary['away_3game_pt_dif'] = away_3game_pt_dif
+    data_dictionary['away_5game_pt_dif'] = away_5game_pt_dif
+    data_dictionary['away_prev_season_pt_dif'] = utils.team_pt_dif_per_game_season(away, year - 1)
 
     features = []
     for f in feature_names:
@@ -181,7 +168,7 @@ for game in games:
     print '{} AT {}   pred winner: {} {}    actual winner: {}    {}'.format(
         away, home, predicted_winner, prediction_pct, actual_winner, prediction_success)
 
-print str(correct_counter) + '/' + str(len(games))
+print str(correct_counter) + '/' + str(len(games)), '({0:.1f})%'.format(float(correct_counter)/len(games)*100)
 
-df = pd.DataFrame(data_display_list)
+df = pd.DataFrame(data_display_list, columns=['teams'] + feature_names)
 print df
