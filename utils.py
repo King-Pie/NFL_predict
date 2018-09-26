@@ -46,6 +46,14 @@ alternate_team_names = {
 }
 
 
+def scrub_data(dataframe, result_to_drop=('UNK', 'tie')):
+
+    for result in result_to_drop:
+        dataframe.drop(dataframe[dataframe.result == result].index, inplace=True)
+
+    return dataframe
+
+
 def get_week_schedule(year, week, season_type='REG'):
 
     week_schedule = []
@@ -257,8 +265,6 @@ def team_pt_dif_per_n_games(team, year, week):
     pt_dif_per_game = float(pt_dif)/len(pt_dif_list)
 
     # three game point differential
-    # if week <= 3:
-
     if len([w for w in week_list if w <= week]) <= 3:
 
         three_game_pt_dif_list_per_week = season_pt_dif_list_per_week[:week-1]
@@ -270,12 +276,7 @@ def team_pt_dif_per_n_games(team, year, week):
     three_game_pt_dif = sum(three_game_pt_dif_list)
     three_game_pt_dif_per_game = float(three_game_pt_dif)/len(three_game_pt_dif_list)
 
-
     # five game point differential
-
-    # print len([w for w in week_list if w <= 5]) <=5
-
-    # if week <= 5:
     if len([w for w in week_list if w <= week]) <= 5:
         five_game_pt_dif_list_per_week = season_pt_dif_list_per_week[:week-1]
 
