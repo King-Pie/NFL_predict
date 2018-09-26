@@ -17,7 +17,7 @@ def data_generator(stat_func, year, set_name, weeks=None):
     else:
         week_list = weeks
 
-    path = './training_data/' + str(year) + '/' + str(set_name) + '.csv'
+    path = './data/training_data/' + str(year) + '/' + str(set_name) + '.csv'
     games = []
     for week in week_list:
         for g in utils.get_week_schedule(year, week):
@@ -199,7 +199,7 @@ def combine_data(year):
     all_files = glob.glob(directory_path + '*.csv')
     df = pd.concat((pd.read_csv(file) for file in all_files),
                    axis=1, sort=False)
-    df.to_csv('./training_data/' + str(year) + '_database.csv', index=False)
+    df.to_csv('./data/training_data/' + str(year) + '_database.csv', index=False)
 
 
 if __name__ == "__main__":

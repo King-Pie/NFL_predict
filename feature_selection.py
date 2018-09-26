@@ -22,7 +22,7 @@ def svc_param_selection(X, y, nfolds):
     return grid_search.best_params_
 
 
-data_path = r'./training_data/'
+data_path = r'./data/training_data/'
 
 # Evaluation set
 # Training set

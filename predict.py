@@ -14,7 +14,7 @@ import itertools
 pd.set_option('display.expand_frame_repr', False)
 pd.options.display.max_rows = 999
 
-data_path = r'./training_data/'
+data_path = r'./data/training_data/'
 
 feature_names = [
     'week',

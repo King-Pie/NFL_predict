@@ -1,7 +1,6 @@
 import utils
 import nflgame
 import sklearn
-from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
@@ -39,7 +38,7 @@ feature_names = [
 
 years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017']
 
-data_path = r'./training_data/'
+data_path = r'./data/training_data/'
 all_files = [data_path + str(year) + '_database.csv' for year in years]
 data_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 
@@ -50,13 +49,13 @@ from sklearn import preprocessing
 scaler = preprocessing.MinMaxScaler()
 
 features_to_scale = ['home_season_pt_dif',
-         'home_3game_pt_dif',
-         'home_5game_pt_dif',
-         'home_prev_season_pt_dif',
-         'away_season_pt_dif',
-         'away_3game_pt_dif',
-         'away_5game_pt_dif',
-         'away_prev_season_pt_dif']
+                     'home_3game_pt_dif',
+                     'home_5game_pt_dif',
+                     'home_prev_season_pt_dif',
+                     'away_season_pt_dif',
+                     'away_3game_pt_dif',
+                     'away_5game_pt_dif',
+                     'away_prev_season_pt_dif']
 
 data_df[features_to_scale] = scaler.fit_transform(data_df[features_to_scale])
 
