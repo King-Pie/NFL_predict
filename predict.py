@@ -4,23 +4,17 @@ import sklearn
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn import preprocessing
+from sklearn.metrics import confusion_matrix
+
 import pandas as pd
+import matplotlib.pylab as plt
+import numpy as np
+import itertools
 
 pd.set_option('display.expand_frame_repr', False)
 pd.options.display.max_rows = 999
 
 data_path = r'./training_data/'
-
-# Evaluation set
-# Training set
-years = ['2010', '2011', '2012', '2013', '2014', '2015']
-all_files = [data_path + str(year) + '_database.csv' for year in years]
-train_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
-
-# Testing set
-years = ['2016', '2017']
-all_files = [data_path + str(year) + '_database.csv' for year in years]
-test_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 
 feature_names = [
     'week',
@@ -44,12 +38,6 @@ feature_names = [
     'away_prev_season_pt_dif'
                  ]
 
-X_train = train_df[feature_names]
-Y_train = train_df['result']
-
-X_test = test_df[feature_names]
-Y_test = test_df['result']
-
 
 def svc_param_selection(X, y, nfolds):
     from sklearn import svm
@@ -63,36 +51,25 @@ def svc_param_selection(X, y, nfolds):
     return grid_search.best_params_
 
 
-print '---------'
-params = svc_param_selection(X_train, Y_train, 3)
-svm = SVC(C=params['C'], gamma=params['gamma'])
-svm.fit(X_train, Y_train)
-print('Accuracy of SVM classifier on training set: {:.2f}'
-      .format(svm.score(X_train, Y_train)))
-print('Accuracy of SVM classifier on test set: {:.2f}'
-      .format(svm.score(X_test, Y_test)))
+print 'Training model'
 
 # Making predictions
-
-# Prediction set
-# Training set
-# years = ['2014', '2015', '2016']
 years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017']
 all_files = [data_path + str(year) + '_database.csv' for year in years]
 train_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
+train_df = utils.scrub_data(train_df)
 
 X_train = train_df[feature_names]
 Y_train = train_df['result']
 
-params = svc_param_selection(X_train, Y_train, 3)
+params = svc_param_selection(X_train, Y_train, 5)
 model = SVC(probability=True, C=params['C'], gamma=params['gamma'])
 model.fit(X_train, Y_train)
 
-print 'Predictions'
 print('Accuracy of SVM classifier on training set: {:.2f}'
-      .format(svm.score(X_train, Y_train)))
+      .format(model.score(X_train, Y_train)))
 
-year, week = 2018, 2
+year, week = 2018, 1
 games = utils.get_week_schedule(year, week)
 
 data_display_list = []
@@ -140,7 +117,6 @@ for game in games:
         features.append(data_dictionary[f])
 
     features = [data_dictionary[f] for f in feature_names]
-
     data_display_list.append(['{} AT {}'.format(away, home)] + features)
 
     prediction = model.predict([features])[0]
@@ -167,7 +143,8 @@ for game in games:
     print '{} AT {}   pred winner: {} {}    actual winner: {}    {}'.format(
         away, home, predicted_winner, prediction_pct, actual_winner, prediction_success)
 
-print str(correct_counter) + '/' + str(len(games)), '({0:.1f})%'.format(float(correct_counter)/len(games)*100)
+print str(correct_counter) + '/' + str(len(games)), \
+    '({0:.1f})%'.format(float(correct_counter)/len(games)*100)
 
 df = pd.DataFrame(data_display_list, columns=['teams'] + feature_names)
 print df
