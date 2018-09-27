@@ -189,12 +189,74 @@ def point_differential_stats(games):
     return data
 
 
+def turnover_stats(games):
+
+    data_dict = {}
+    data = []
+    header = [
+        'home_season_turnovers',
+        'home_3game_turnovers',
+        'home_5game_turnovers',
+        'home_prev_season_turnovers',
+        'away_season_turnovers',
+        'away_3game_turnovers',
+        'away_5game_turnovers',
+        'away_prev_season_turnovers',
+        'home_season_turnover_dif',
+        'home_3game_turnover_dif',
+        'home_5game_turnover_dif',
+        'home_prev_season_turnover_dif',
+        'away_season_turnover_dif',
+        'away_3game_turnover_dif',
+        'away_5game_turnover_dif',
+        'away_prev_season_turnover_dif',
+    ]
+    data.append(header)
+
+    week_dummy = 0
+    for game in games:
+        # for convenience
+        year, week = game['year'], game['week']
+        home, away = game['home'], game['away']
+
+        # print home, away
+
+        # print progress generating each week
+        if week_dummy != week:
+            if week % 4 == 0:
+                print 'Generating matchup stats for {} week {}'.format(year, week)
+        week_dummy = week
+
+        # Previous season stats
+        home_prev_season_turnover_dict = utils.turnovers_per_game_season(home, year-1)
+        away_prev_season_turnover_dict = utils.turnovers_per_game_season(away, year-1)
+        data_dict['home_prev_season_turnovers'] = home_prev_season_turnover_dict['turnovers_per_game']
+        data_dict['home_prev_season_turnover_dif'] = home_prev_season_turnover_dict['turnover_dif_per_game']
+        data_dict['away_prev_season_turnovers'] = away_prev_season_turnover_dict['turnovers_per_game']
+        data_dict['away_prev_season_turnover_dif'] = away_prev_season_turnover_dict['turnover_dif_per_game']
+
+        for team, label in zip([home, away], ['home', 'away']):
+
+            turnover_dict = utils.turnovers_per_game(team, year, week)
+            data_dict[label + '_season_turnovers'] = turnover_dict['season_turnovers_per_game']
+            data_dict[label + '_3game_turnovers'] = turnover_dict['3game_turnovers_per_game']
+            data_dict[label + '_5game_turnovers'] = turnover_dict['5game_turnovers_per_game']
+            data_dict[label + '_season_turnover_dif'] = turnover_dict['season_turnover_dif_per_game']
+            data_dict[label + '_3game_turnover_dif'] = turnover_dict['3game_turnover_dif_per_game']
+            data_dict[label + '_5game_turnover_dif'] = turnover_dict['5game_turnover_dif_per_game']
+
+        row = [data_dict[h] for h in header]
+        data.append(row)
+
+    return data
+
+
 def combine_data(year):
     import glob
 
     print 'Combing data for {}'.format(year)
 
-    directory_path = './training_data/' + str(year) + '/'
+    directory_path = './data/training_data/' + str(year) + '/'
 
     all_files = glob.glob(directory_path + '*.csv')
     df = pd.concat((pd.read_csv(file) for file in all_files),
@@ -211,5 +273,6 @@ if __name__ == "__main__":
         # data_generator(schedule_stats, year, '1_schedule_stats')
         # data_generator(current_record_stats, year, '2_current_record_stats')
         # data_generator(matchup_stats, year, '3_matchup_stats')
-        data_generator(point_differential_stats, year, '4_point_differential_stats')
+        # data_generator(point_differential_stats, year, '4_point_differential_stats')
+        data_generator(turnover_stats, year, '5_turnover_stats')
         combine_data(year)

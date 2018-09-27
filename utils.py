@@ -266,7 +266,6 @@ def team_pt_dif_per_n_games(team, year, week):
 
     # three game point differential
     if len([w for w in week_list if w <= week]) <= 3:
-
         three_game_pt_dif_list_per_week = season_pt_dif_list_per_week[:week-1]
     else:
         three_game_pt_dif_list_per_week = \
@@ -300,10 +299,130 @@ def team_pt_dif_per_n_games(team, year, week):
         round(five_game_pt_dif_per_game, 3)
 
 
+def turnovers_per_week(team, year):
+
+    try:
+        season_games = nflgame.games(year, home=team, away=team)
+    except TypeError:
+        team = alternate_team_names[team]
+        season_games = nflgame.games(year, home=team, away=team)
+
+    week_list = []
+    turnover_list = []
+    turnover_dif_list = []
+
+    for g in season_games:
+        w = g.schedule['week']
+        if g.is_home(team):
+            team_turnovers = g.stats_home.turnovers
+            opponent_turnovers = g.stats_away.turnovers
+            turnover_dif = opponent_turnovers - team_turnovers
+        else:
+            team_turnovers = g.stats_away.turnovers
+            opponent_turnovers = g.stats_home.turnovers
+            turnover_dif = opponent_turnovers - team_turnovers
+
+        week_list.append(w)
+        turnover_list.append(team_turnovers)
+        turnover_dif_list.append(turnover_dif)
+
+    turnover_dict = {'week': week_list,
+                     'turnovers': turnover_list,
+                     'turnover_dif': turnover_dif_list}
+
+    return turnover_dict
+
+
+def turnovers_per_game_season(team, year):
+
+    season_turnover_dict = turnovers_per_week(team, year)
+    turnovers = season_turnover_dict['turnovers']
+    turnover_dif = season_turnover_dict['turnover_dif']
+
+    turnovers_per_game = np.mean(turnovers)
+    turnover_dif_per_game = np.mean(turnover_dif)
+
+    return {'turnovers_per_game': turnovers_per_game,
+            'turnover_dif_per_game': turnover_dif_per_game}
+
+
+def turnovers_per_game(team, year, week):
+
+    empty_dict = {
+        'season_turnovers_per_game': 0,
+        '3game_turnovers_per_game': 0,
+        '5game_turnovers_per_game': 0,
+        'season_turnover_dif_per_game': 0,
+        '3game_turnover_dif_per_game': 0,
+        '5game_turnover_dif_per_game': 0
+    }
+
+    if week <= 1:
+        return empty_dict
+
+    # season turnovers so far
+    season_turnover_dict = turnovers_per_week(team, year)
+    week_list = season_turnover_dict['week']
+    turnovers_list = season_turnover_dict['turnovers']
+    turnover_dif_list = season_turnover_dict['turnover_dif']
+
+    # print week_list
+    # print turnovers_list
+    # print turnover_dif_list
+
+    try:
+        last_game_week = max([w for w in week_list if w <= week-1])
+        last_game_week_idx = week_list.index(last_game_week)
+    except ValueError:
+        return empty_dict
+
+    # Season so far
+    turnovers_per_game_list = turnovers_list[0:last_game_week_idx+1]
+    season_turnovers_per_game = np.mean(turnovers_per_game_list)
+    turnover_dif_per_game_list = turnover_dif_list[0:last_game_week_idx+1]
+    season_turnover_dif_per_game = np.mean(turnover_dif_per_game_list)
+
+    # print turnovers_per_game_list, season_turnovers_per_game
+    # print turnover_dif_per_game_list, season_turnover_dif_per_game
+
+    # Last three game turnovers
+    if len(turnovers_per_game_list) <= 3:
+        team_3game_turnovers_per_game = season_turnovers_per_game
+        team_3game_turnover_dif_per_game = season_turnover_dif_per_game
+    else:
+        team_3game_turnovers_per_game = np.mean(turnovers_per_game_list[-3:])
+        team_3game_turnover_dif_per_game = np.mean(turnover_dif_per_game_list[-3:])
+
+    # Last five game turnovers
+    if len(turnovers_per_game_list) <= 5:
+        team_5game_turnovers_per_game = season_turnovers_per_game
+        team_5game_turnover_dif_per_game = season_turnover_dif_per_game
+    else:
+        team_5game_turnovers_per_game = np.mean(turnovers_per_game_list[-5:])
+        team_5game_turnover_dif_per_game = np.mean(turnover_dif_per_game_list[-5:])
+
+    turnover_dict = {
+        'season_turnovers_per_game': season_turnovers_per_game,
+        '3game_turnovers_per_game': team_3game_turnovers_per_game,
+        '5game_turnovers_per_game': team_5game_turnovers_per_game,
+        'season_turnover_dif_per_game': season_turnover_dif_per_game,
+        '3game_turnover_dif_per_game': team_3game_turnover_dif_per_game,
+        '5game_turnover_dif_per_game': team_5game_turnover_dif_per_game
+    }
+
+    # Rounding
+    for key in turnover_dict:
+        turnover_dict[key] = round(turnover_dict[key], 3)
+
+    return turnover_dict
+
+
 if __name__ == "__main__":
 
-    print team_pt_dif_per_n_games('TB', 2017, 10)
-    print team_pt_dif_per_game_season('TB', 2016)
+    test_team = 'GB'
+    year = 2017
+    print turnovers_per_game_season(test_team, year)
+    print turnovers_per_game(test_team, year, week=8)
 
     # test_team = 'TB'
     # print test_team, division_dictionary[test_team]
