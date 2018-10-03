@@ -191,7 +191,7 @@ def point_differential_stats(games):
 
 def turnover_stats(games):
 
-    data_dict = {}
+    data_dictionary = {}
     data = []
     header = [
         'home_season_turnovers',
@@ -230,22 +230,21 @@ def turnover_stats(games):
         # Previous season stats
         home_prev_season_turnover_dict = utils.turnovers_per_game_season(home, year-1)
         away_prev_season_turnover_dict = utils.turnovers_per_game_season(away, year-1)
-        data_dict['home_prev_season_turnovers'] = home_prev_season_turnover_dict['turnovers_per_game']
-        data_dict['home_prev_season_turnover_dif'] = home_prev_season_turnover_dict['turnover_dif_per_game']
-        data_dict['away_prev_season_turnovers'] = away_prev_season_turnover_dict['turnovers_per_game']
-        data_dict['away_prev_season_turnover_dif'] = away_prev_season_turnover_dict['turnover_dif_per_game']
+        data_dictionary['home_prev_season_turnovers'] = home_prev_season_turnover_dict['turnovers_per_game']
+        data_dictionary['home_prev_season_turnover_dif'] = home_prev_season_turnover_dict['turnover_dif_per_game']
+        data_dictionary['away_prev_season_turnovers'] = away_prev_season_turnover_dict['turnovers_per_game']
+        data_dictionary['away_prev_season_turnover_dif'] = away_prev_season_turnover_dict['turnover_dif_per_game']
 
         for team, label in zip([home, away], ['home', 'away']):
-
             turnover_dict = utils.turnovers_per_game(team, year, week)
-            data_dict[label + '_season_turnovers'] = turnover_dict['season_turnovers_per_game']
-            data_dict[label + '_3game_turnovers'] = turnover_dict['3game_turnovers_per_game']
-            data_dict[label + '_5game_turnovers'] = turnover_dict['5game_turnovers_per_game']
-            data_dict[label + '_season_turnover_dif'] = turnover_dict['season_turnover_dif_per_game']
-            data_dict[label + '_3game_turnover_dif'] = turnover_dict['3game_turnover_dif_per_game']
-            data_dict[label + '_5game_turnover_dif'] = turnover_dict['5game_turnover_dif_per_game']
+            data_dictionary[label + '_season_turnovers'] = turnover_dict['season_turnovers_per_game']
+            data_dictionary[label + '_3game_turnovers'] = turnover_dict['3game_turnovers_per_game']
+            data_dictionary[label + '_5game_turnovers'] = turnover_dict['5game_turnovers_per_game']
+            data_dictionary[label + '_season_turnover_dif'] = turnover_dict['season_turnover_dif_per_game']
+            data_dictionary[label + '_3game_turnover_dif'] = turnover_dict['3game_turnover_dif_per_game']
+            data_dictionary[label + '_5game_turnover_dif'] = turnover_dict['5game_turnover_dif_per_game']
 
-        row = [data_dict[h] for h in header]
+        row = [data_dictionary[h] for h in header]
         data.append(row)
 
     return data
