@@ -219,12 +219,10 @@ def turnover_stats(games):
         year, week = game['year'], game['week']
         home, away = game['home'], game['away']
 
-        # print home, away
-
         # print progress generating each week
         if week_dummy != week:
             if week % 4 == 0:
-                print 'Generating matchup stats for {} week {}'.format(year, week)
+                print 'Generating turnover stats for {} week {}'.format(year, week)
         week_dummy = week
 
         # Previous season stats
@@ -250,6 +248,44 @@ def turnover_stats(games):
     return data
 
 
+def third_down_pct_stats(games):
+
+    data_dictionary = {}
+    headers = [
+        'home_season_3down_pct',
+        'home_3game_3down_pct',
+        'home_5game_3down_pct',
+        'away_season_3down_pct',
+        'away_3game_3down_pct',
+        'away_5game_3down_pct'
+    ]
+    data = []
+    data.append(headers)
+
+    week_dummy = 0
+    for game in games:
+        # for convenience
+        year, week = game['year'], game['week']
+        home, away = game['home'], game['away']
+
+        # print progress generating each week
+        if week_dummy != week:
+            if week % 4 == 0:
+                print 'Generating third down stats for {} week {}'.format(year, week)
+        week_dummy = week
+
+        for team, label in zip([home, away], ['home', 'away']):
+            tdp_dict = utils.third_down_pct_per_game(team, year, week)
+            data_dictionary[label + '_season_3down_pct'] = tdp_dict['season_3down_pct_per_game']
+            data_dictionary[label + '_3game_3down_pct'] = tdp_dict['3game_3down_pct_per_game']
+            data_dictionary[label + '_5game_3down_pct'] = tdp_dict['5game_3down_pct_per_game']
+
+        row = [data_dictionary[h] for h in headers]
+        data.append(row)
+
+    return data
+
+
 def combine_data(year):
     import glob
 
@@ -266,6 +302,7 @@ def combine_data(year):
 if __name__ == "__main__":
 
     years = training_year_list
+    years = [2017]
     print years
     for year in years:
         print 'Data generation for {}'.format(year)
@@ -273,5 +310,6 @@ if __name__ == "__main__":
         # data_generator(current_record_stats, year, '2_current_record_stats')
         # data_generator(matchup_stats, year, '3_matchup_stats')
         # data_generator(point_differential_stats, year, '4_point_differential_stats')
-        data_generator(turnover_stats, year, '5_turnover_stats')
+        # data_generator(turnover_stats, year, '5_turnover_stats')
+        data_generator(third_down_pct_stats, year, '6_third_down_stats')
         combine_data(year)

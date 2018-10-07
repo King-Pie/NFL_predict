@@ -26,7 +26,7 @@ feature_names = [
     'away_a_wpct',
     'away_prev_wpct',
     'away_prev_a_wpct',
-    'div_flag',
+    # 'div_flag',
     'matchup_weight',
     'home_season_pt_dif',
     'home_3game_pt_dif',
@@ -35,7 +35,29 @@ feature_names = [
     'away_season_pt_dif',
     'away_3game_pt_dif',
     'away_5game_pt_dif',
-    'away_prev_season_pt_dif'
+    'away_prev_season_pt_dif',
+    'home_season_turnovers',
+    'home_3game_turnovers',
+    'home_5game_turnovers',
+    'home_prev_season_turnovers',
+    'home_season_turnover_dif',
+    'home_3game_turnover_dif',
+    'home_5game_turnover_dif',
+    'home_prev_season_turnover_dif',
+    'away_season_turnovers',
+    'away_3game_turnovers',
+    'away_5game_turnovers',
+    'away_prev_season_turnovers',
+    'away_season_turnover_dif',
+    'away_3game_turnover_dif',
+    'away_5game_turnover_dif',
+    'away_prev_season_turnover_dif',
+    'home_season_3down_pct',
+    'home_3game_3down_pct',
+    'home_5game_3down_pct',
+    'away_season_3down_pct',
+    'away_3game_3down_pct',
+    'away_5game_3down_pct'
                  ]
 
 
@@ -62,14 +84,15 @@ train_df = utils.scrub_data(train_df)
 X_train = train_df[feature_names]
 Y_train = train_df['result']
 
-params = svc_param_selection(X_train, Y_train, 5)
+params = svc_param_selection(X_train, Y_train, 2)
 model = SVC(probability=True, C=params['C'], gamma=params['gamma'])
+# model = SVC()
 model.fit(X_train, Y_train)
 
 print('Accuracy of SVM classifier on training set: {:.2f}'
-      .format(model.score(X_train, Y_train)))
+      .format(model.score(X_train, Y_train)*100))
 
-year, week = 2018, 1
+year, week = 2018, 4
 games = utils.get_week_schedule(year, week)
 
 data_display_list = []
@@ -111,6 +134,29 @@ for game in games:
     data_dictionary['away_3game_pt_dif'] = away_3game_pt_dif
     data_dictionary['away_5game_pt_dif'] = away_5game_pt_dif
     data_dictionary['away_prev_season_pt_dif'] = utils.team_pt_dif_per_game_season(away, year - 1)
+
+    # Previous season stats
+    home_prev_season_turnover_dict = utils.turnovers_per_game_season(home, year - 1)
+    away_prev_season_turnover_dict = utils.turnovers_per_game_season(away, year - 1)
+    data_dictionary['home_prev_season_turnovers'] = home_prev_season_turnover_dict['turnovers_per_game']
+    data_dictionary['home_prev_season_turnover_dif'] = home_prev_season_turnover_dict['turnover_dif_per_game']
+    data_dictionary['away_prev_season_turnovers'] = away_prev_season_turnover_dict['turnovers_per_game']
+    data_dictionary['away_prev_season_turnover_dif'] = away_prev_season_turnover_dict['turnover_dif_per_game']
+
+    for team, label in zip([home, away], ['home', 'away']):
+        turnover_dict = utils.turnovers_per_game(team, year, week)
+        data_dictionary[label + '_season_turnovers'] = turnover_dict['season_turnovers_per_game']
+        data_dictionary[label + '_3game_turnovers'] = turnover_dict['3game_turnovers_per_game']
+        data_dictionary[label + '_5game_turnovers'] = turnover_dict['5game_turnovers_per_game']
+        data_dictionary[label + '_season_turnover_dif'] = turnover_dict['season_turnover_dif_per_game']
+        data_dictionary[label + '_3game_turnover_dif'] = turnover_dict['3game_turnover_dif_per_game']
+        data_dictionary[label + '_5game_turnover_dif'] = turnover_dict['5game_turnover_dif_per_game']
+
+    for team, label in zip([home, away], ['home', 'away']):
+        tdp_dict = utils.third_down_pct_per_game(team, year, week)
+        data_dictionary[label + '_season_3down_pct'] = tdp_dict['season_3down_pct_per_game']
+        data_dictionary[label + '_3game_3down_pct'] = tdp_dict['3game_3down_pct_per_game']
+        data_dictionary[label + '_5game_3down_pct'] = tdp_dict['5game_3down_pct_per_game']
 
     features = []
     for f in feature_names:

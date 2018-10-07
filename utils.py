@@ -1,5 +1,6 @@
 import nflgame
 import numpy as np
+import pandas as pd
 
 division_dictionary = {
     'ARI': 'NFC_west',
@@ -205,8 +206,6 @@ def matchup_weight(game, prev_seasons=2, verbose=False):
 
         print '\n'
 
-    # return home_matchup_wpct, away_matchup_wpct
-    # return (home_matchup_wpct - away_matchup_wpct)*0.5 + 0.5
     return home_matchup_wpct - away_matchup_wpct
 
 
@@ -288,11 +287,6 @@ def team_pt_dif_per_n_games(team, year, week):
     five_game_pt_dif = sum(five_game_pt_dif_list)
     five_game_pt_dif_per_game = float(five_game_pt_dif)/len(five_game_pt_dif_list)
 
-    # print season_pt_dif_list_per_week
-    # print pt_dif_list
-    # print three_game_pt_dif_list
-    # print five_game_pt_dif_list
-
     return \
         round(pt_dif_per_game, 3), \
         round(three_game_pt_dif_per_game, 3), \
@@ -366,10 +360,6 @@ def turnovers_per_game(team, year, week):
     turnovers_list = season_turnover_dict['turnovers']
     turnover_dif_list = season_turnover_dict['turnover_dif']
 
-    # print week_list
-    # print turnovers_list
-    # print turnover_dif_list
-
     try:
         last_game_week = max([w for w in week_list if w <= week-1])
         last_game_week_idx = week_list.index(last_game_week)
@@ -381,9 +371,6 @@ def turnovers_per_game(team, year, week):
     season_turnovers_per_game = np.mean(turnovers_per_game_list)
     turnover_dif_per_game_list = turnover_dif_list[0:last_game_week_idx+1]
     season_turnover_dif_per_game = np.mean(turnover_dif_per_game_list)
-
-    # print turnovers_per_game_list, season_turnovers_per_game
-    # print turnover_dif_per_game_list, season_turnover_dif_per_game
 
     # Last three game turnovers
     if len(turnovers_per_game_list) <= 3:
@@ -417,15 +404,104 @@ def turnovers_per_game(team, year, week):
     return turnover_dict
 
 
+def third_down_pct_game(team, game):
+
+    attempts, conversions = 0, 0
+    play_generator = game.drives.plays()
+
+    for play in play_generator.filter(team=team, third_down_att=1):
+        attempts += 1.
+        conversions += play.third_down_conv
+
+    if conversions == 0:
+        third_down_pct = 0
+    else:
+        third_down_pct = round(conversions/attempts, 3)
+
+    return third_down_pct
+
+
+def third_down_pct_per_week(team, year):
+
+    try:
+        season_games = nflgame.games(year, home=team, away=team)
+    except TypeError:
+        team = alternate_team_names[team]
+        season_games = nflgame.games(year, home=team, away=team)
+
+    week_list = []
+    third_down_pct_list = []
+
+    for g in season_games:
+        week_list.append(g.schedule['week'])
+        third_down_pct_list.append(third_down_pct_game(team, g))
+
+    return {'week': week_list,
+            'third_down_pct': third_down_pct_list}
+
+
+def third_down_pct_per_game(team, year, week):
+
+    empty_dict = {
+        'season_3down_pct_per_game': 0,
+        '3game_3down_pct_per_game': 0,
+        '5game_3down_pct_per_game': 0}
+
+    if week <= 1:
+        return empty_dict
+
+    # season third down percentage so far
+    season_tdp_dict = third_down_pct_per_week(team, year)
+    week_list = season_tdp_dict['week']
+    tdp_list = season_tdp_dict['third_down_pct']
+
+    try:
+        last_game_week = max([w for w in week_list if w <= week-1])
+        last_game_week_idx = week_list.index(last_game_week)
+    except ValueError:
+        return empty_dict
+
+    # Season so far
+    tdp_per_game_list = tdp_list[0:last_game_week_idx+1]
+    season_tdp_per_game = np.mean(tdp_per_game_list)
+
+    # Last three games
+    if len(tdp_per_game_list) <= 3:
+        team_3game_tdp = season_tdp_per_game
+    else:
+        team_3game_tdp = np.mean(tdp_per_game_list[-3:])
+
+    # Last five games
+    if len(tdp_per_game_list) <= 5:
+        team_5game_tdp = season_tdp_per_game
+    else:
+        team_5game_tdp = np.mean(tdp_per_game_list[-5:])
+
+    tdp_dict = {
+        'season_3down_pct_per_game': season_tdp_per_game,
+        '3game_3down_pct_per_game': team_3game_tdp,
+        '5game_3down_pct_per_game': team_5game_tdp}
+
+    # Rounding
+    for key in tdp_dict:
+        tdp_dict[key] = round(tdp_dict[key], 3)
+
+    return tdp_dict
+
+
 if __name__ == "__main__":
 
-    test_team = 'GB'
-    year = 2017
-    print turnovers_per_game_season(test_team, year)
-    print turnovers_per_game(test_team, year, week=8)
+    test_team = 'TB'
+    year = 2016
 
-    # test_team = 'TB'
-    # print test_team, division_dictionary[test_team]
-    #
-    # print team_record(test_team, 2017)
-    # print team_season_win_pct(test_team, 2017)
+
+
+    data = []
+    for team in nflgame.teams:
+
+        data.append([team[0],
+                     third_down_pct_per_game(team[0], year, week=17)['season_3down_pct_per_game'],
+                     team_record(team[0], year)])
+
+    df = pd.DataFrame(data, columns=['team', 'tdp', 'record'])
+    print df.sort_values('tdp', ascending=False)
