@@ -8,27 +8,94 @@ pd.options.display.max_rows = 999
 
 
 training_year_list = range(2010, 2018)
+stat_function_names = [
+    'schedule_stats',
+    'current_record_stats',
+    'matchup_stats',
+    'point_differential_stats',
+    'turnover_stats',
+    'third_down_pct_stats']
 
 
-def data_generator(stat_func, year, set_name, weeks=None):
+def stat_function_list():
+    return [globals()[k] for k in stat_function_names]
 
-    if weeks is None:
-        week_list = range(1, 18)
-    else:
-        week_list = weeks
 
-    path = './data/training_data/' + str(year) + '/' + str(set_name) + '.csv'
+def year_data_generator(stat_func, year):
+
     games = []
-    for week in week_list:
+    for week in range(1, 18):
         for g in utils.get_week_schedule(year, week):
             games.append(g)
 
-    data = stat_func(games)
+    data, set_name = stat_func(games)
+    path = './data/training_data/{}/{}.csv'.format(year, set_name)
 
     with open(path, 'wb') as csv_file:
         writer = csv.writer(csv_file)
         for line in data:
             writer.writerow(line)
+
+
+def week_data_generator(stat_func, year, week):
+    import os
+
+    games = utils.get_week_schedule(year, week)
+
+    data, set_name = stat_func(games)
+    directory = './data/prediction_data/{}/{}/'.format(year, week)
+    file_name = '{}.csv'.format(set_name)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    path = directory + file_name
+
+    with open(path, 'wb') as csv_file:
+        writer = csv.writer(csv_file)
+        for line in data:
+            writer.writerow(line)
+
+
+def schedule_stats(games):
+    """
+    Generates basic stats about the game which don't change throughout the season
+    :param games:
+    :return:
+    """
+    header = ['gamekey', 'year', 'week',
+              'away', 'away_prev_wpct', 'away_prev_a_wpct',
+              'home', 'home_prev_wpct', 'home_prev_h_wpct',
+              'div_flag']
+
+    data = []
+    data.append(header)
+
+    print 'Generating schedule stats:'
+
+    week_dummy = 0  # for reporting progress
+    for game in games:
+        # for convenience
+        year, week = game['year'], game['week']
+        home, away = game['home'], game['away']
+
+        # print progress generating each week
+        if week_dummy != week:
+            if week % 4 == 0:
+                print '{} week {}'.format(year, week)
+        week_dummy = week
+
+        game['home_prev_wpct'] = utils.team_prev_season_win_pct(home, year, prev_seasons=1)
+        game['home_prev_h_wpct'] = utils.team_prev_season_win_pct(home, year, prev_seasons=1,
+                                                                  type='home')
+        game['away_prev_wpct'] = utils.team_prev_season_win_pct(away, year, prev_seasons=1)
+        game['away_prev_a_wpct'] = utils.team_prev_season_win_pct(away, year, prev_seasons=1,
+                                                                  type='away')
+
+        game['div_flag'] = utils.divisional_flag(home, away)
+
+        row = [game[h] for h in header]
+        data.append(row)
+
+    return data, '1_schedule_stats'
 
 
 def current_record_stats(games):
@@ -39,6 +106,8 @@ def current_record_stats(games):
     data = []
     data.append(header)
 
+    print 'Generating current record stats:'
+
     week_dummy = 0      # for reporting progress
     for game in games:
         # for convenience
@@ -47,7 +116,8 @@ def current_record_stats(games):
 
         # print progress generating each week
         if week_dummy != week:
-            print 'Generating current record stats {} week {}'.format(year, week)
+            if week % 4 == 0:
+                print '{} week {}'.format(year, week)
         week_dummy = week
 
         # home record
@@ -77,47 +147,7 @@ def current_record_stats(games):
         row = [game[h] for h in header]
         data.append(row)
 
-    return data
-
-
-def schedule_stats(games):
-    """
-    Generates basic stats about the game which don't change throughout the season
-    :param game:
-    :return:
-    """
-    header = ['gamekey', 'year', 'week',
-              'away', 'away_prev_wpct', 'away_prev_a_wpct',
-              'home', 'home_prev_wpct', 'home_prev_h_wpct',
-              'div_flag']
-
-    data = []
-    data.append(header)
-
-    week_dummy = 0  # for reporting progress
-    for game in games:
-        # for convenience
-        year, week = game['year'], game['week']
-        home, away = game['home'], game['away']
-
-        # print progress generating each week
-        if week_dummy != week:
-            print 'Generating schedule stats for {} week {}'.format(year, week)
-        week_dummy = week
-
-        game['home_prev_wpct'] = utils.team_prev_season_win_pct(home, year, prev_seasons=1)
-        game['home_prev_h_wpct'] = utils.team_prev_season_win_pct(home, year, prev_seasons=1,
-                                                                  type='home')
-        game['away_prev_wpct'] = utils.team_prev_season_win_pct(away, year, prev_seasons=1)
-        game['away_prev_a_wpct'] = utils.team_prev_season_win_pct(away, year, prev_seasons=1,
-                                                                  type='away')
-
-        game['div_flag'] = utils.divisional_flag(home, away)
-
-        row = [game[h] for h in header]
-        data.append(row)
-
-    return data
+    return data, '2_current_record_stats'
 
 
 def matchup_stats(games):
@@ -128,6 +158,8 @@ def matchup_stats(games):
     data = []
     data.append(header)
 
+    print 'Generating matchup stats:'
+
     week_dummy = 0  # for reporting progress
     for game in games:
         # for convenience
@@ -137,14 +169,14 @@ def matchup_stats(games):
         # print progress generating each week
         if week_dummy != week:
             if week % 4 == 0:
-                print 'Generating matchup stats for {} week {}'.format(year, week)
+                print '{} week {}'.format(year, week)
         week_dummy = week
 
         data_dict['matchup_weight'] = utils.matchup_weight(game)
         row = [data_dict[h] for h in header]
         data.append(row)
 
-    return data
+    return data, '3_matchup_stats'
 
 
 def point_differential_stats(games):
@@ -154,6 +186,8 @@ def point_differential_stats(games):
     header = ['home_season_pt_dif', 'home_3game_pt_dif', 'home_5game_pt_dif', 'home_prev_season_pt_dif',
               'away_season_pt_dif', 'away_3game_pt_dif', 'away_5game_pt_dif', 'away_prev_season_pt_dif']
     data.append(header)
+
+    print 'Generating point differential stats:'
 
     week_dummy = 0
     for game in games:
@@ -166,7 +200,7 @@ def point_differential_stats(games):
         # print progress generating each week
         if week_dummy != week:
             if week % 4 == 0:
-                print 'Generating matchup stats for {} week {}'.format(year, week)
+                print '{} week {}'.format(year, week)
         week_dummy = week
 
         home_season_pt_dif, home_3game_pt_dif, home_5game_pt_dif = \
@@ -186,7 +220,7 @@ def point_differential_stats(games):
         row = [data_dict[h] for h in header]
         data.append(row)
 
-    return data
+    return data, '4_point_differential_stats'
 
 
 def turnover_stats(games):
@@ -213,6 +247,8 @@ def turnover_stats(games):
     ]
     data.append(header)
 
+    print 'Generating turnover stats:'
+
     week_dummy = 0
     for game in games:
         # for convenience
@@ -222,7 +258,7 @@ def turnover_stats(games):
         # print progress generating each week
         if week_dummy != week:
             if week % 4 == 0:
-                print 'Generating turnover stats for {} week {}'.format(year, week)
+                print '{} week {}'.format(year, week)
         week_dummy = week
 
         # Previous season stats
@@ -245,7 +281,7 @@ def turnover_stats(games):
         row = [data_dictionary[h] for h in header]
         data.append(row)
 
-    return data
+    return data, '5_turnover_stats'
 
 
 def third_down_pct_stats(games):
@@ -262,6 +298,8 @@ def third_down_pct_stats(games):
     data = []
     data.append(headers)
 
+    print 'Generating third down stats:'
+
     week_dummy = 0
     for game in games:
         # for convenience
@@ -271,7 +309,7 @@ def third_down_pct_stats(games):
         # print progress generating each week
         if week_dummy != week:
             if week % 4 == 0:
-                print 'Generating third down stats for {} week {}'.format(year, week)
+                print '{} week {}'.format(year, week)
         week_dummy = week
 
         for team, label in zip([home, away], ['home', 'away']):
@@ -283,33 +321,54 @@ def third_down_pct_stats(games):
         row = [data_dictionary[h] for h in headers]
         data.append(row)
 
-    return data
+    return data, '6_third_down_stats'
 
 
-def combine_data(year):
+def combine_yearly_training_data(year):
     import glob
 
     print 'Combing data for {}'.format(year)
 
-    directory_path = './data/training_data/' + str(year) + '/'
+    directory_path = './data/training_data/{}/'.format(year)
 
     all_files = glob.glob(directory_path + '*.csv')
-    df = pd.concat((pd.read_csv(file) for file in all_files),
+    df = pd.concat((pd.read_csv(f) for f in all_files),
                    axis=1, sort=False)
-    df.to_csv('./data/training_data/' + str(year) + '_database.csv', index=False)
+    df.to_csv('./data/training_data/{}_database.csv'.format(year), index=False)
+
+
+def generate_and_combine_week_data(year, week, update_only=True):
+    import glob
+
+    print 'Generating and combining weekly data for {} week {}'.format(year, week)
+
+    directory_path = './data/prediction_data/{}/{}/'.format(year, week)
+    all_files = glob.glob(directory_path + '*.csv')
+
+    for func in stat_function_list():
+        week_data_generator(func, year, week)
+
+    all_files = glob.glob(directory_path + '*.csv')
+    df = pd.concat((pd.read_csv(f) for f in all_files),
+                   axis=1, sort=False)
+    df.to_csv('./data/prediction_data/{}/week_{}_database.csv'.format(year, week), index=False)
 
 
 if __name__ == "__main__":
 
-    years = training_year_list
-    years = [2017]
-    print years
-    for year in years:
-        print 'Data generation for {}'.format(year)
-        # data_generator(schedule_stats, year, '1_schedule_stats')
-        # data_generator(current_record_stats, year, '2_current_record_stats')
-        # data_generator(matchup_stats, year, '3_matchup_stats')
-        # data_generator(point_differential_stats, year, '4_point_differential_stats')
-        # data_generator(turnover_stats, year, '5_turnover_stats')
-        data_generator(third_down_pct_stats, year, '6_third_down_stats')
-        combine_data(year)
+    week_list = [4, 5]
+    for week in week_list:
+        generate_and_combine_week_data(2018, week)
+
+    # years = training_year_list
+    # years = [2017]
+    # print years
+    # for year in years:
+    #     print 'Data generation for {}'.format(year)
+    #     year_data_generator(schedule_stats, year)
+    #     year_data_generator(current_record_stats, year)
+    #     year_data_generator(matchup_stats, year)
+    #     year_data_generator(point_differential_stats, year)
+    #     year_data_generator(turnover_stats, year)
+    #     year_data_generator(third_down_pct_stats, year)
+    #     combine_yearly_training_data(year)
