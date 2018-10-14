@@ -14,7 +14,7 @@ from sklearn import preprocessing
 pd.set_option('display.expand_frame_repr', False)
 pd.options.display.max_rows = 999
 
-data_path = r'./data/training_data/'
+data_path = r'./data/game_data/'
 
 # Training set
 years = ['2010', '2011', '2012', '2013', '2014', '2015']

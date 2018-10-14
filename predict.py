@@ -9,7 +9,7 @@ import pandas as pd
 pd.set_option('display.expand_frame_repr', False)
 pd.options.display.max_rows = 999
 
-data_path = r'./data/training_data/'
+data_path = r'./data/game_data/'
 
 feature_names = [
     'week',
@@ -88,7 +88,7 @@ print('Accuracy of SVM classifier on training set: {:.2f}'
 
 year, week = 2018, 5
 
-prediction_data_path = r'./data/prediction_data/{}/week_{}_database.csv'.format(year, week)
+prediction_data_path = r'./data/game_data/{}/week_{}_database.csv'.format(year, week)
 prediction_df = pd.read_csv(prediction_data_path)
 prediction_data = prediction_df[feature_names]
 predictions = model.predict(prediction_data)
@@ -112,10 +112,14 @@ for g in range(game_count):
         actual_winner = home
     elif result == 'tie':
         actual_winner = 'tie'
-    else:
+    elif result == 'loss':
         actual_winner = away
+    else:
+        actual_winner = 'UNK'
 
-    if pred_winner == actual_winner:
+    if actual_winner == 'UNK':
+        success = '-'
+    elif pred_winner == actual_winner:
         success = 'Correct'
         success_counter += 1
     else:

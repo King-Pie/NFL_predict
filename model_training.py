@@ -38,7 +38,7 @@ feature_names = [
 
 years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017']
 
-data_path = r'./data/training_data/'
+data_path = r'./data/game_data/'
 all_files = [data_path + str(year) + '_database.csv' for year in years]
 data_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 
