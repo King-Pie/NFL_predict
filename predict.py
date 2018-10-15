@@ -3,6 +3,7 @@ import nflgame
 import sklearn
 import numpy as np
 from sklearn.svm import SVC
+import os
 
 import pandas as pd
 
@@ -86,47 +87,56 @@ model.fit(X_train, Y_train)
 print('Accuracy of SVM classifier on training set: {:.2f}'
       .format(model.score(X_train, Y_train)*100))
 
-year, week = 2018, 5
+year = 2018
+for week in range(1, 18):
 
-prediction_data_path = r'./data/game_data/{}/week_{}_database.csv'.format(year, week)
-prediction_df = pd.read_csv(prediction_data_path)
-prediction_data = prediction_df[feature_names]
-predictions = model.predict(prediction_data)
-prediction_prob = model.predict_proba(prediction_data)
+    # year, week = 2018, 5
 
-game_array = np.array(prediction_df[['away', 'home', 'result']])
+    prediction_data_path = r'./data/game_data/{}/week_{}_database.csv'.format(year, week)
+    prediction_df = pd.read_csv(prediction_data_path)
+    prediction_data = prediction_df[feature_names]
+    predictions = model.predict(prediction_data)
+    prediction_prob = model.predict_proba(prediction_data)
 
-success_counter = 0
-game_count = len(prediction_df.index)
-for g in range(game_count):
-    away, home, result = game_array[g]
-    pred = predictions[g]
-    prob = round(max(prediction_prob[g])*100, 2)
+    game_array = np.array(prediction_df[['away', 'home', 'result']])
 
-    if pred == 'win':
-        pred_winner = home
-    else:
-        pred_winner = away
+    prediction_array = []
+    prediction_array_header = \
+        ['game', 'predicted_winner', 'prediction_probability', 'actual_winner', 'success']
+    game_count = len(prediction_df.index)
+    for g in range(game_count):
+        away, home, result = game_array[g]
+        pred = predictions[g]
+        prob = round(max(prediction_prob[g])*100, 2)
 
-    if result == 'win':
-        actual_winner = home
-    elif result == 'tie':
-        actual_winner = 'tie'
-    elif result == 'loss':
-        actual_winner = away
-    else:
-        actual_winner = 'UNK'
+        pred_winner_dict = {'win': home, 'loss': away}
+        pred_winner = pred_winner_dict[pred]
 
-    if actual_winner == 'UNK':
-        success = '-'
-    elif pred_winner == actual_winner:
-        success = 'Correct'
-        success_counter += 1
-    else:
-        success = 'Wrong'
+        actual_winner_dict = {'win': home, 'tie': 'tie',
+                              'loss': away, 'UNK': 'UNK'}
+        actual_winner = actual_winner_dict[result]
 
-    print '{} @ {}   Predicted winner: {} ({}%)   Winner: {}   {}'\
-        .format(away, home, pred_winner, prob, actual_winner, success)
+        if actual_winner == 'UNK' or actual_winner == 'tie':
+            success = '-'
+        elif pred_winner == actual_winner:
+            success = 'Correct'
+        else:
+            success = 'Wrong'
 
-correct_percentage = round((float(success_counter)/game_count)*100, 2)
-print '{}/{} {}%'.format(success_counter, game_count, correct_percentage)
+        game = '{} @ {}'.format(away, home)
+        prediction_array.append([game, pred_winner, prob, actual_winner, success])
+
+    df = pd.DataFrame(prediction_array, columns=prediction_array_header)
+    success_counter = len(df.loc[df['success'] == 'Correct'])
+    game_count = len(df['game'])
+    success_pct = round((float(success_counter)/game_count)*100, 2)
+    print df
+    print '{}/{} {}%'.format(success_counter, game_count, success_pct)
+
+    directory = './predictions/{}/'.format(year)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    path = directory + 'week_{}_predictions.csv'.format(week)
+
+    df.to_csv(path, index=False)
+

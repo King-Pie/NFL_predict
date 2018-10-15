@@ -1,0 +1,17 @@
+game,predicted_winner,prediction_probability,actual_winner,success
+ATL @ PHI,PHI,70.62,PHI,Correct
+BUF @ BAL,BAL,70.8,BAL,Correct
+PIT @ CLE,PIT,55.14,tie,-
+CIN @ IND,IND,58.88,CIN,Wrong
+TEN @ MIA,MIA,58.0,MIA,Correct
+SF @ MIN,MIN,72.36,MIN,Correct
+HOU @ NE,NE,73.7,NE,Correct
+TB @ NO,NO,71.97,TB,Wrong
+JAX @ NYG,JAX,56.99,JAX,Correct
+KC @ LAC,LAC,65.34,KC,Wrong
+WAS @ ARI,ARI,62.68,WAS,Wrong
+DAL @ CAR,CAR,65.15,CAR,Correct
+SEA @ DEN,DEN,55.16,DEN,Correct
+CHI @ GB,GB,63.02,GB,Correct
+NYJ @ DET,DET,69.59,NYJ,Wrong
+LA @ OAK,LA,51.44,LA,Correct
