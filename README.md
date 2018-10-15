@@ -22,6 +22,7 @@ SEA @ DEN|DEN|55.16|DEN|Correct
 CHI @ GB|GB|63.02|GB|Correct
 NYJ @ DET|DET|69.59|NYJ|Wrong
 LA @ OAK|LA|51.44|LA|Correct
+
 10/16  62.5%
 
 ### Week 2
@@ -43,6 +44,7 @@ OAK @ DEN|DEN|69.7|DEN|Correct
 NE @ JAX|JAX|66.84|JAX|Correct
 NYG @ DAL|DAL|65.85|DAL|Correct
 SEA @ CHI|CHI|60.55|CHI|Correct
+
 10/16 62.5%
 
 ### Week 3
@@ -64,6 +66,7 @@ CHI @ ARI|CHI|52.8|CHI|Correct
 DAL @ SEA|SEA|53.23|SEA|Correct
 NE @ DET|NE|59.24|DET|Wrong
 PIT @ TB|TB|67.58|PIT|Wrong
+
 9/16 56.25%
 
 ### Week 4
@@ -84,6 +87,7 @@ SF @ LAC|LAC|68.63|LAC|Correct
 NO @ NYG|NO|59.19|NO|Correct
 BAL @ PIT|BAL|50.78|BAL|Correct
 KC @ DEN|KC|65.67|KC|Correct
+
 12/15 80.0%
 
 ### Week 5
@@ -104,4 +108,5 @@ ARI @ SF|SF|69.49|ARI|Wrong
 LA @ SEA|LA|54.5|LA|Correct
 DAL @ HOU|HOU|53.07|HOU|Correct
 WAS @ NO|NO|68.86|NO|Correct
+
 11/15 73.33%
