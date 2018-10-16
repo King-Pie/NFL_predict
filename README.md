@@ -110,3 +110,24 @@ DAL @ HOU|HOU|53.07|HOU|Correct
 WAS @ NO|NO|68.86|NO|Correct
 
 11/15 73.33%
+
+### Week 6
+Game     | Predicted Winner | Probability | Winner | Success
+| ------ | :--------------: | ----------- | ------ | -------|
+PHI @ NYG|PHI|64.65|PHI|Correct
+TB @ ATL|ATL|61.26|ATL|Correct
+PIT @ CIN|CIN|57.72|PIT|Wrong
+LAC @ CLE|LAC|58.57|LAC|Correct
+BUF @ HOU|HOU|69.14|HOU|Correct
+CHI @ MIA|CHI|64.37|MIA|Wrong
+ARI @ MIN|MIN|75.2|MIN|Correct
+IND @ NYJ|NYJ|67.68|NYJ|Correct
+SEA @ OAK|SEA|62.08|SEA|Correct
+CAR @ WAS|CAR|50.77|WAS|Wrong
+LA @ DEN|LA|71.17|LA|Correct
+JAX @ DAL|JAX|53.66|DAL|Wrong
+BAL @ TEN|BAL|58.7|BAL|Correct
+KC @ NE|NE|63.06|NE|Correct
+SF @ GB|GB|66.47|GB|Correct
+
+11/15 73.33%
