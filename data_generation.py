@@ -131,6 +131,12 @@ class StatsGenerator:
         return data
 
     def game_result_stats(self, games):
+        """
+        Generates stats for the result for each game if known, converting it into terms of a home win/loss,
+        tie or unknown result (i.e game hasn't been played)
+        :param games:
+        :return:
+        """
         import nflgame
 
         header = ['result']
@@ -160,6 +166,11 @@ class StatsGenerator:
         return data
 
     def record_stats(self, games):
+        """
+        Generates stats regarding the home and away team's season records so far
+        :param games:
+        :return:
+        """
         import utils
 
         header = ['away_record', 'away_wpct', 'away_a_wpct',
@@ -194,7 +205,11 @@ class StatsGenerator:
         return data
 
     def matchup_stats(self, games):
-
+        """
+        Generates stats of all the home vs away games in season so far and previous 2 seasons
+        :param games:
+        :return:
+        """
         import utils
 
         header = ['matchup_weight']
@@ -206,10 +221,6 @@ class StatsGenerator:
         print 'Generating matchup stats'
 
         for game in games:
-            # for convenience
-            year, week = game['year'], game['week']
-            home, away = game['home'], game['away']
-
             data_dict['matchup_weight'] = utils.matchup_weight(game)
             row = [data_dict[h] for h in header]
             data.append(row)
@@ -217,7 +228,11 @@ class StatsGenerator:
         return data
 
     def point_differential_stats(self, games):
-
+        """ Generates stats of each team's point differential over the previous season, seeason so far and last
+        3 and 5 games
+        :param games:
+        :return:
+        """
         import utils
 
         data_dict = {}
@@ -255,7 +270,11 @@ class StatsGenerator:
         return data
 
     def turnover_stats(self, games):
-
+        """
+        Generates turnover stats for each team so far that season, last season and last 2 and 5 games
+        :param games:
+        :return:
+        """
         import utils
 
         data_dictionary = {}
@@ -320,7 +339,11 @@ class StatsGenerator:
         return data
 
     def third_down_pct_stats(self, games):
-
+        """
+        Generates turnover stats for each team
+        :param games:
+        :return:
+        """
         import utils
 
         data_dictionary = {}
