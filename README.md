@@ -131,3 +131,62 @@ KC @ NE|NE|63.06|NE|Correct
 SF @ GB|GB|66.47|GB|Correct
 
 11/15 73.33%
+
+### Week 7
+Game     | Predicted Winner | Probability | Winner | Success
+| ------ | :--------------: | ----------- | ------ | -------|
+DEN @ ARI|ARI|53.09|DEN|Wrong
+TEN @ LAC|LAC|69.5|LAC|Correct
+NO @ BAL|BAL|66.56|NO|Wrong
+NE @ CHI|CHI|57.61|NE|Wrong
+BUF @ IND|IND|59.52|IND|Correct
+HOU @ JAX|JAX|68.93|HOU|Wrong
+CIN @ KC|KC|71.54|KC|Correct
+DET @ MIA|DET|50.52|DET|Correct
+MIN @ NYJ|NYJ|52.91|MIN|Wrong
+CAR @ PHI|PHI|68.53|CAR|Wrong
+CLE @ TB|TB|56.66|TB|Correct
+DAL @ WAS|DAL|51.96|WAS|Wrong
+LA @ SF|LA|71.25|LA|Correct
+NYG @ ATL|ATL|66.14|ATL|Correct
+
+7/14 50.0%
+
+### Week 8
+Game     | Predicted Winner | Probability | Winner | Success
+| ------ | :--------------: | ----------- | ------ | -------|
+MIA @ HOU|HOU|66.3|HOU|Correct
+PHI @ JAX|PHI|55.98|PHI|Correct
+BAL @ CAR|BAL|55.36|CAR|Wrong
+NYJ @ CHI|CHI|70.59|CHI|Correct
+TB @ CIN|CIN|54.71|CIN|Correct
+SEA @ DET|DET|57.52|SEA|Wrong
+DEN @ KC|KC|71.78|KC|Correct
+WAS @ NYG|WAS|63.05|WAS|Correct
+CLE @ PIT|PIT|69.46|PIT|Correct
+IND @ OAK|IND|53.76|IND|Correct
+SF @ ARI|ARI|52.07|ARI|Correct
+GB @ LA|LA|71.92|LA|Correct
+NO @ MIN|NO|50.75|NO|Correct
+NE @ BUF|NE|76.86|NE|Correct
+
+12/14 85.71%
+
+### Week 9
+Game     | Predicted Winner | Probability | Winner | Success
+| ------ | :--------------: | ----------- | ------ | -------|
+OAK @ SF|SF|59.09|SF|Correct
+PIT @ BAL|BAL|57.7|PIT|Wrong
+CHI @ BUF|CHI|72.41|CHI|Correct
+TB @ CAR|CAR|73.47|CAR|Correct
+KC @ CLE|KC|77.83|KC|Correct
+NYJ @ MIA|NYJ|60.53|MIA|Wrong
+DET @ MIN|MIN|65.56|MIN|Correct
+ATL @ WAS|WAS|62.09|ATL|Wrong
+HOU @ DEN|DEN|54.21|HOU|Wrong
+LAC @ SEA|SEA|63.07|LAC|Wrong
+LA @ NO|NO|64.54|NO|Correct
+GB @ NE|NE|71.32|NE|Correct
+TEN @ DAL|DAL|67.24|TEN|Wrong
+
+7/13 53.85%
