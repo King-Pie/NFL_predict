@@ -81,19 +81,20 @@ Y_train = train_df['result']
 
 params = svc_param_selection(X_train, Y_train, 2)
 model = SVC(probability=True, C=params['C'], gamma=params['gamma'])
-# model = SVC(probability=True)
 model.fit(X_train, Y_train)
 
 print('Accuracy of SVM classifier on training set: {:.2f}'
       .format(model.score(X_train, Y_train)*100))
 
 year = 2018
-for week in range(1, 18):
-
-    # year, week = 2018, 5
+weeks = range(1, 18)
+for week in weeks:
 
     prediction_data_path = r'./data/game_data/{}/week_{}_database.csv'.format(year, week)
-    prediction_df = pd.read_csv(prediction_data_path)
+    try:
+        prediction_df = pd.read_csv(prediction_data_path)
+    except IOError:
+        break
     prediction_data = prediction_df[feature_names]
     predictions = model.predict(prediction_data)
     prediction_prob = model.predict_proba(prediction_data)
